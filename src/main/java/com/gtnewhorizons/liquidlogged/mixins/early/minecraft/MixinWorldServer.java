@@ -25,11 +25,16 @@ public abstract class MixinWorldServer implements WorldFluidTicks {
     @Unique
     private static final int CHUNK_GUARD = 6;
 
+    // No field initializer: World's constructor already loads spawn chunks (and reads their ticks) before
+    // WorldServer's fields are initialized, so an initializer would be null then and overwrite them after
     @Unique
-    private final FluidTickList liquidlogged$ticks = new FluidTickList();
+    private FluidTickList liquidlogged$ticks;
 
     @Override
-    public FluidTickList liquidlogged$ticks() {
+    public synchronized FluidTickList liquidlogged$ticks() {
+        if (liquidlogged$ticks == null) {
+            liquidlogged$ticks = new FluidTickList();
+        }
         return liquidlogged$ticks;
     }
 
@@ -37,7 +42,8 @@ public abstract class MixinWorldServer implements WorldFluidTicks {
     private void liquidlogged$tickStoredFluids(boolean runAll, CallbackInfoReturnable<Boolean> cir) {
         World world = (World) (Object) this;
         long now = world.getTotalWorldTime();
-        for (FluidTick tick : liquidlogged$ticks.pollDue(now, MAX_TICKS_PER_TICK)) {
+        FluidTickList ticks = liquidlogged$ticks();
+        for (FluidTick tick : ticks.pollDue(now, MAX_TICKS_PER_TICK)) {
             Fluid fluid = LiquidLoggedAPI.getFluid(world, tick.x, tick.y, tick.z);
             if (fluid == null || fluid.getBlock() == null) {
                 continue;
@@ -52,7 +58,7 @@ public abstract class MixinWorldServer implements WorldFluidTicks {
                 tick.x + CHUNK_GUARD,
                 tick.y,
                 tick.z + CHUNK_GUARD)) {
-                liquidlogged$ticks.schedule(tick.x, tick.y, tick.z, now + rate * 5L, tick.priority);
+                ticks.schedule(tick.x, tick.y, tick.z, now + rate * 5L, tick.priority);
                 continue;
             }
             LoggedFlow.tick(world, tick.x, tick.y, tick.z, fluid);
