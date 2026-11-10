@@ -12,14 +12,17 @@ import com.gtnewhorizons.liquidlogged.internal.fill.PistonHooks;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
-@Mixin(BlockPistonBase.class)
+// Lower priority than the default 1000 so this applies before other mixins that @Overwrite these methods.
+@Mixin(value = BlockPistonBase.class, priority = 500)
 public abstract class MixinBlockPistonBase {
 
+    // require = 0: a mod that overwrites these methods (Et Futurum Requiem) makes the hook a no-op instead of a crash.
     @WrapOperation(
         method = { "tryExtend", "onBlockEventReceived" },
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/World;setTileEntity(IIILnet/minecraft/tileentity/TileEntity;)V"))
+            target = "Lnet/minecraft/world/World;setTileEntity(IIILnet/minecraft/tileentity/TileEntity;)V"),
+        require = 0)
     private void liquidlogged$carryFluid(World world, int x, int y, int z, TileEntity te, Operation<Void> original) {
         if (!world.isRemote && te instanceof TileEntityPiston) {
             PistonHooks.capture(world, x, y, z, (TileEntityPiston) te);
