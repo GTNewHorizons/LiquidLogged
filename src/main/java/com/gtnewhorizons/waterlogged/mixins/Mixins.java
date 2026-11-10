@@ -43,6 +43,10 @@ public enum Mixins implements IMixins {
             .addCommonMixins("minecraft.MixinChunk_Light", "minecraft.MixinWorld_Light", "minecraft.AccessorChunk")
             .setApplyIf(() -> true)
             .setPhase(Phase.EARLY)),
+    PISTONS(new MixinBuilder("Pistons move a block's stored fluid with the block")
+            .addCommonMixins("minecraft.MixinBlockPistonBase", "minecraft.MixinTileEntityPiston")
+            .setApplyIf(() -> true)
+            .setPhase(Phase.EARLY)),
     RENDER(new MixinBuilder("Draw the fluid stored in blocks")
             .addClientMixins("minecraft.client.MixinWorldRenderer", "minecraft.client.MixinRenderBlocks")
             .setApplyIf(() -> true)
