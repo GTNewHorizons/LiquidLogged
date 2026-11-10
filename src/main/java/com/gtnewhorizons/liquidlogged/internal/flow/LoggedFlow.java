@@ -113,13 +113,16 @@ public final class LoggedFlow {
     private static boolean isSideClosed(IBlockAccess world, int x, int y, int z, ForgeDirection side,
         boolean forRender) {
         Block block = world.getBlock(x, y, z);
+        // Leaves (including other mods') stop flow but are see-through; 26.2 still draws the water inside them
+        if (block instanceof BlockLeaves) {
+            return !forRender;
+        }
         if (VanillaHolders.isVanillaHolder(block)) {
-            FaceSolidity.Shape shape = shapeOf(block);
-            // Leaves stop flow but are see-through; 26.2 still draws the water inside them
-            if (forRender && shape == FaceSolidity.Shape.LEAVES) {
-                return false;
-            }
-            return FaceSolidity.isSolid(shape, world.getBlockMetadata(x, y, z), side);
+            return FaceSolidity.isSolid(shapeOf(block), world.getBlockMetadata(x, y, z), side);
+        }
+        // Fluid is drawn inside a see-through block; flow stays closed by the checks below
+        if (forRender && !block.isOpaqueCube()) {
+            return false;
         }
         if (block instanceof IFluidHolder) {
             return !((IFluidHolder) block).isFluidPassable(world, x, y, z, side);
