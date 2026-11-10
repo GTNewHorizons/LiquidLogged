@@ -25,6 +25,7 @@ import com.gtnewhorizons.liquidlogged.api.LiquidLoggedAPI;
 import com.gtnewhorizons.liquidlogged.internal.rules.FaceSolidity;
 import com.gtnewhorizons.liquidlogged.internal.rules.VanillaHolders;
 import com.gtnewhorizons.liquidlogged.mixins.early.minecraft.AccessorBlockDynamicLiquid;
+import com.gtnewhorizons.liquidlogged.mixins.early.minecraft.AccessorBlockLiquid;
 
 /** Flow out of a block that stores a fluid: it acts as a permanent source behind the block's closed faces. */
 public final class LoggedFlow {
@@ -48,6 +49,13 @@ public final class LoggedFlow {
         }
         AccessorBlockDynamicLiquid liquid = (AccessorBlockDynamicLiquid) flowing;
         if (canPass(world, x, y, z, ForgeDirection.DOWN) && liquid.liquidlogged$canFlowInto(world, x, y - 1, z)) {
+            // Vanilla BlockDynamicLiquid.updateTick: lava falling onto water turns it into stone
+            if (flowing.getMaterial() == Material.lava && world.getBlock(x, y - 1, z)
+                .getMaterial() == Material.water) {
+                world.setBlock(x, y - 1, z, Blocks.stone);
+                ((AccessorBlockLiquid) flowing).liquidlogged$fizz(world, x, y - 1, z);
+                return;
+            }
             liquid.liquidlogged$flowInto(world, x, y - 1, z, 8);
             return;
         }

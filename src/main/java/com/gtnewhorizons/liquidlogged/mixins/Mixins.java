@@ -33,7 +33,8 @@ public enum Mixins implements IMixins {
             .addCommonMixins(
                 "minecraft.MixinWorldServer",
                 "minecraft.MixinBlockDynamicLiquid",
-                "minecraft.AccessorBlockDynamicLiquid")
+                "minecraft.AccessorBlockDynamicLiquid",
+                "minecraft.AccessorBlockLiquid")
             .setApplyIf(() -> true)
             .setPhase(Phase.EARLY)),
     ENTITIES(new MixinBuilder("Entities swim, drift and drown in stored fluid; explosions respect it")
@@ -42,6 +43,10 @@ public enum Mixins implements IMixins {
             .setPhase(Phase.EARLY)),
     LIGHT(new MixinBuilder("Stored fluid dims and emits light like its source block")
             .addCommonMixins("minecraft.MixinChunk_Light", "minecraft.MixinWorld_Light", "minecraft.AccessorChunk")
+            .setApplyIf(() -> true)
+            .setPhase(Phase.EARLY)),
+    FIRE(new MixinBuilder("Blocks holding water do not burn")
+            .addCommonMixins("minecraft.MixinBlockFire")
             .setApplyIf(() -> true)
             .setPhase(Phase.EARLY)),
     PISTONS(new MixinBuilder("Pistons move a block's stored fluid with the block")

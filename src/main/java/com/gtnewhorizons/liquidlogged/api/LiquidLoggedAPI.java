@@ -36,9 +36,10 @@ public final class LiquidLoggedAPI {
         HolderRegistry.register(block, predicate);
     }
 
-    /** Returns true if the block placed at this position may hold the fluid. */
+    /** Returns true if the block placed at this position may hold the fluid; false where the chunk is not loaded. */
     public static boolean canHold(World world, int x, int y, int z, Fluid fluid) {
-        return HolderRegistry.canHold(world, x, y, z, fluid);
+        // world.getBlock would load or even generate the chunk
+        return world.blockExists(x, y, z) && HolderRegistry.canHold(world, x, y, z, fluid);
     }
 
     /** Stores the fluid in the block (null removes it); server side only, returns false if not allowed or cancelled. */

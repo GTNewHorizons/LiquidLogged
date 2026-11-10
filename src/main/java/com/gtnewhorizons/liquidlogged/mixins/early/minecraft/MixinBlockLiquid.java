@@ -32,9 +32,10 @@ public abstract class MixinBlockLiquid {
         return RenderHooks.metaOrSource(world, x, y, z, original.call(world, x, y, z));
     }
 
-    // World variant used by BlockDynamicLiquid: neighbouring stored fluid feeds flow and counts as a source
+    // func_149804_e: neighbouring stored fluid feeds flow and counts as a source.
+    // func_149805_n: lava next to a block holding water hardens into obsidian or cobblestone, as in 26.2
     @WrapOperation(
-        method = "func_149804_e",
+        method = { "func_149804_e", "func_149805_n" },
         at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getBlock(III)Lnet/minecraft/block/Block;"))
     private Block liquidlogged$worldFluidAsBlock(World world, int x, int y, int z, Operation<Block> original) {
         return RenderHooks.blockOrFluid(world, x, y, z, original.call(world, x, y, z));

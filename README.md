@@ -16,6 +16,6 @@ LiquidLoggedAPI.registerPredicate(myBlock, (world, x, y, z, block, meta, fluid) 
 LiquidLoggedAPI.setFluid(world, x, y, z, FluidRegistry.WATER);
 ```
 
-Call `LiquidLoggedAPI.revalidate` after you change a tile entity in a way that changes that answer. A renderer with its own `IBlockAccess`, such as Angelica's `WorldSlice`, can implement `LiquidLoggedBlockAccess` and copy section data from `LiquidLoggedAPI.getSection`.
+Call `LiquidLoggedAPI.revalidate` after you change a tile entity in a way that changes that answer. A renderer with its own `IBlockAccess`, such as Angelica's `WorldSlice`, can implement `LiquidLoggedBlockAccess` and copy section data from `LiquidLoggedAPI.getSection`. A mesher that draws stored fluids itself calls `LiquidLoggedRenderAPI.beginStoredFluid` and `endStoredFluid` around the draw, and `isFaceCovered` to skip faces a block hides.
 
 Operators can inspect and change stored fluids with `/liquidlogged get|set|clear <x> <y> <z> [fluid]`.
