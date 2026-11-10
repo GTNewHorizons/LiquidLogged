@@ -6,7 +6,7 @@
 		"description": "Blocks that hold a fluid, like vanilla waterlogging.",
 		"version": "${modVersion}",
 		"mcversion": "${minecraftVersion}",
-		"url": "",
+		"url": "https://github.com/GTNewHorizons/LiquidLogged",
 		"updateUrl": "",
 		"authorList": ["Eldrinn-Elantey"],
 		"credits": "",
