@@ -9,7 +9,7 @@ import net.minecraftforge.fluids.Fluid;
 
 import com.gtnewhorizons.liquidlogged.mixins.early.minecraft.AccessorChunk;
 
-/** A cell's light is the stronger of its block and its stored fluid: opacity and emitted light (design §8.4). */
+/** A cell's opacity and emitted light are the stronger of its block and its stored fluid. */
 public final class LightHooks {
 
     private LightHooks() {}

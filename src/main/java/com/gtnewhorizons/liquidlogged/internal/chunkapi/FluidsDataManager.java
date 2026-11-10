@@ -118,7 +118,7 @@ public final class FluidsDataManager
             if ((subChunkMask & (1 << i)) == 0) {
                 continue;
             }
-            // One entry per masked section even when it is null, so both sides stay aligned
+            // Write an entry for a null section too, or the reader falls out of step with the buffer
             SectionFluids fluids = sections[i] == null ? null : ((LiquidLoggedSection) sections[i]).liquidlogged$get();
             SectionFluidsPacket.write(fluids, buffer, Fluid::getID);
         }

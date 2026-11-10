@@ -16,7 +16,7 @@ import com.gtnewhorizons.liquidlogged.api.LiquidLoggedAPI;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
-/** Fills a block a player places into a fluid source (design §7.2.1); register on the Forge event bus. */
+/** Fills a block a player places into a fluid source; register it on the Forge event bus. */
 public class PlacementHandler {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

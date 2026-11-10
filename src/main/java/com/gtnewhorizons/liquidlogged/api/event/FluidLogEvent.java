@@ -8,7 +8,7 @@ import net.minecraftforge.fluids.Fluid;
 import cpw.mods.fml.common.eventhandler.Cancelable;
 import cpw.mods.fml.common.eventhandler.Event;
 
-/** Posted on the Forge event bus before a block's stored fluid changes; cancel it to keep the old fluid. */
+/** Fires on the Forge event bus before a block's stored fluid changes; cancel it to keep the old fluid. */
 @Cancelable
 public class FluidLogEvent extends Event {
 

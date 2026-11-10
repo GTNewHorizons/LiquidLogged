@@ -10,9 +10,7 @@ import net.minecraftforge.fluids.Fluid;
 import com.gtnewhorizons.liquidlogged.api.LiquidLoggedAPI;
 import com.gtnewhorizons.liquidlogged.internal.flow.LoggedFlow;
 
-/**
- * Shared helpers for the render mixins: a cell holding a fluid looks like that fluid's source block to fluid renderers.
- */
+/** Render and material helpers: a cell holding a fluid looks like that fluid's source block. */
 public final class RenderHooks {
 
     // True while a fluid stored in a block is being drawn; Angelica meshes off-thread, hence per thread

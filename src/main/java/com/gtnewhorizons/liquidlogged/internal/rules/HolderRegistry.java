@@ -13,7 +13,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import com.gtnewhorizons.liquidlogged.api.FluidHolderPredicate;
 import com.gtnewhorizons.liquidlogged.api.IFluidHolder;
 
-/** Answers "may this block hold this fluid" in the order of design §10. */
+/** Answers whether a block may hold a fluid: IFluidHolder first, then registered predicates, then the vanilla list. */
 public final class HolderRegistry {
 
     private static final Map<Block, List<FluidHolderPredicate>> PREDICATES = new IdentityHashMap<>();

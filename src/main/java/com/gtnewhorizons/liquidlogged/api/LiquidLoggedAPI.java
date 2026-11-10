@@ -19,10 +19,7 @@ public final class LiquidLoggedAPI {
 
     private LiquidLoggedAPI() {}
 
-    /**
-     * Returns the fluid stored in the block, or null; null for any access that is not a
-     * {@link LiquidLoggedBlockAccess}.
-     */
+    /** Returns the stored fluid, or null if none or the access is not a {@link LiquidLoggedBlockAccess}. */
     public static @Nullable Fluid getFluid(IBlockAccess world, int x, int y, int z) {
         return world instanceof LiquidLoggedBlockAccess
             ? ((LiquidLoggedBlockAccess) world).liquidlogged$getFluid(x, y, z)
@@ -62,9 +59,7 @@ public final class LiquidLoggedAPI {
         return WorldFluids.setUnchecked(world, x, y, z, fluid);
     }
 
-    /**
-     * Removes the stored fluid if the block can no longer hold it; call after changing a TE without changing the block.
-     */
+    /** Drops the stored fluid if the block no longer accepts it; call after a TE change that keeps the block. */
     public static void revalidate(World world, int x, int y, int z) {
         Fluid fluid = getFluid(world, x, y, z);
         if (fluid != null && !canHold(world, x, y, z, fluid)) {

@@ -8,7 +8,7 @@ import net.minecraft.init.Blocks;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 
-/** Decides what happens to a cell's fluid when its block changes (design §7.1). */
+/** Decides what happens to a cell's fluid when its block changes. */
 public final class BlockChangeRules {
 
     public enum Outcome {

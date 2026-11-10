@@ -10,7 +10,7 @@ import net.minecraftforge.fluids.Fluid;
 import com.gtnewhorizons.liquidlogged.api.LiquidLoggedAPI;
 import com.gtnewhorizons.liquidlogged.internal.storage.ChunkFluids;
 
-/** Moves a block's stored fluid together with the block when a piston pushes or pulls it (design §7.5). */
+/** Moves a block's stored fluid together with the block when a piston pushes or pulls it. */
 public final class PistonHooks {
 
     private PistonHooks() {}
@@ -37,7 +37,7 @@ public final class PistonHooks {
             return;
         }
         ((MovingFluid) piston).liquidlogged$setFluid(fluid);
-        // Silent clear: the cell is overwritten right after, and a source left behind would be wrong
+        // Clear without notifying: the piston overwrites the cell next, and a leftover source would be wrong
         ChunkFluids.set(world.getChunkFromBlockCoords(sx, sz), sx & 15, sy, sz & 15, null);
     }
 

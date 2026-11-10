@@ -7,7 +7,7 @@ import java.util.Set;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
-/** Vanilla blocks that hold water as in Minecraft 26.2 (design §12); exact instances, never subclasses. */
+/** Vanilla blocks that hold water in Minecraft 26.2; matches exact instances, not subclasses. */
 public final class VanillaHolders {
 
     private static Set<Block> holders;

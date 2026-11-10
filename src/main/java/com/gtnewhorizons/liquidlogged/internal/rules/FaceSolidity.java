@@ -2,7 +2,7 @@ package com.gtnewhorizons.liquidlogged.internal.rules;
 
 import net.minecraftforge.common.util.ForgeDirection;
 
-/** Faces of vanilla holders that stop fluid, matching 26.2 shapes rather than Forge isSideSolid. */
+/** Faces of vanilla holders that stop fluid, following Minecraft 26.2 block shapes. */
 public final class FaceSolidity {
 
     public enum Shape {

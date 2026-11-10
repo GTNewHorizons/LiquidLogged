@@ -17,7 +17,7 @@ import com.gtnewhorizons.liquidlogged.api.LiquidLoggedAPI;
 
 import cpw.mods.fml.common.eventhandler.Event;
 
-/** Bucket use on blocks that hold or may hold a fluid (design §7.2.2–3); null means "let vanilla handle it". */
+/** Bucket use on blocks that hold or may hold a fluid; a null result lets vanilla handle the click. */
 public final class BucketHooks {
 
     private BucketHooks() {}

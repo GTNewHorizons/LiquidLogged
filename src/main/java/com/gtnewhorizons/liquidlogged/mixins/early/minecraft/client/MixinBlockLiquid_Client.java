@@ -11,11 +11,10 @@ import com.gtnewhorizons.liquidlogged.internal.client.RenderHooks;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
-/** Client only: shouldSideBeRendered is stripped on a dedicated server. */
 @Mixin(BlockLiquid.class)
 public abstract class MixinBlockLiquid_Client {
 
-    // No face between a liquid and a neighbouring cell that holds the same liquid
+    // No face between a liquid and a neighbouring cell that holds it. Client-only: the server strips this method
     @WrapOperation(
         method = "shouldSideBeRendered",
         at = @At(

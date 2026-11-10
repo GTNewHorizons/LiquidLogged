@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 import net.minecraftforge.fluids.Fluid;
 
-/** Network format of one section's fluids in chunk packets (design §5). */
+/** Network format of one section's fluids in chunk packets: a palette of fluid ids, then dense or sparse cells. */
 public final class SectionFluidsPacket {
 
     private static final int MAX_VARINT = 5;

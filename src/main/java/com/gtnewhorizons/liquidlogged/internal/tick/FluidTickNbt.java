@@ -7,7 +7,7 @@ import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
 
-/** Chunk NBT of pending stored-fluid ticks (design §4.3): chunk-local x/z, delay relative to world time. */
+/** Chunk NBT of pending stored-fluid ticks: chunk-local x/z, delay relative to world time. */
 public final class FluidTickNbt {
 
     public static final byte VERSION = 1;

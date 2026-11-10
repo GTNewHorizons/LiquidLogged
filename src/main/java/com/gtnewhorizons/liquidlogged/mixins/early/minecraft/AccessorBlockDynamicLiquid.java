@@ -6,7 +6,7 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-/** Vanilla spreading helpers, reused so a stored source spreads exactly like a vanilla source. */
+/** Invokers for the private spreading helpers of BlockDynamicLiquid. */
 @Mixin(BlockDynamicLiquid.class)
 public interface AccessorBlockDynamicLiquid {
 

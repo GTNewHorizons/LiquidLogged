@@ -9,7 +9,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fluids.Fluid;
 
-/** Reads and writes the fluids of one section in the format of design §4.2. */
+/** Reads and writes one section's fluids as NBT: a palette of fluid names and one byte per cell. */
 public final class SectionFluidsNbt {
 
     public static final byte VERSION = 1;

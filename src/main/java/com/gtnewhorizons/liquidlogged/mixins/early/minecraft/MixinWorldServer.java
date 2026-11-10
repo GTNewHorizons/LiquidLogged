@@ -50,7 +50,7 @@ public abstract class MixinWorldServer implements WorldFluidTicks {
             }
             int rate = fluid.getBlock()
                 .tickRate(world);
-            // Same guard as Hodgepodge preventLoadingChunksWhenLiquidsFlow, applied always
+            // Same guard as Hodgepodge preventLoadingChunksWhenLiquidsFlow, even when that option is off
             if (!world.checkChunksExist(
                 tick.x - CHUNK_GUARD,
                 tick.y,

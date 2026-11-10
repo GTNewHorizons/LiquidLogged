@@ -6,7 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fluids.Fluid;
 
-/** Decides for blocks whose code you cannot change; register with {@link LiquidLoggedAPI#registerPredicate}. */
+/** Rules for a block whose code you cannot change; register with {@link LiquidLoggedAPI#registerPredicate}. */
 @FunctionalInterface
 public interface FluidHolderPredicate {
 

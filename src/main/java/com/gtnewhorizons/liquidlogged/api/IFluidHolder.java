@@ -4,7 +4,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 
-/** Implement on a Block to decide which fluids it may hold; called only when the block and its TE are in the world. */
+/** Implement on a Block to choose which fluids it holds; LiquidLogged asks only once the block and its TE exist. */
 public interface IFluidHolder {
 
     /** Returns true if the block at this position may hold the fluid. */
