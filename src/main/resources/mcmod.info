@@ -1,0 +1,21 @@
+{
+	"modListVersion": 2,
+	"modList": [{
+		"modid": "${modId}",
+		"name": "${modName}",
+		"description": "Blocks that hold a fluid, like vanilla waterlogging.",
+		"version": "${modVersion}",
+		"mcversion": "${minecraftVersion}",
+		"url": "",
+		"updateUrl": "",
+		"authorList": ["Eldrinn-Elantey"],
+		"credits": "",
+		"logoFile": "",
+		"screenshots": [],
+		"parent": "",
+		"requiredMods": ["chunkapi"],
+		"dependencies": ["chunkapi"],
+		"dependants": [],
+		"useDependencyInformation": false
+	}]
+}
