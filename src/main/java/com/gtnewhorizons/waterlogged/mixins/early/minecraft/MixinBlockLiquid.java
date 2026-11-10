@@ -15,9 +15,9 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 @Mixin(BlockLiquid.class)
 public abstract class MixinBlockLiquid {
 
-    // Neighbouring cells holding a fluid count as that fluid's source: no face between them, flow points away from them
+    // Neighbouring cells holding a fluid count as that fluid's source: flow points away from them
     @WrapOperation(
-        method = { "shouldSideBeRendered", "getEffectiveFlowDecay" },
+        method = "getEffectiveFlowDecay",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/world/IBlockAccess;getBlock(III)Lnet/minecraft/block/Block;"))

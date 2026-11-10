@@ -46,6 +46,6 @@ public final class RenderHooks {
 
     /** Returns true if the block in the cell covers the given side, so the stored fluid must not draw a face there. */
     public static boolean ownSideCovered(IBlockAccess world, int x, int y, int z, int side) {
-        return LoggedFlow.isSideClosed(world, x, y, z, ForgeDirection.getOrientation(side));
+        return LoggedFlow.isSideCoveredForRender(world, x, y, z, ForgeDirection.getOrientation(side));
     }
 }

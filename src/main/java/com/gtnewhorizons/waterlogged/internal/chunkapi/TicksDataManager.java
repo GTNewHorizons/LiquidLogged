@@ -5,12 +5,15 @@ import javax.annotation.Nullable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.event.world.ChunkEvent;
 
 import com.falsepattern.chunk.api.DataManager;
 import com.gtnewhorizons.waterlogged.Tags;
 import com.gtnewhorizons.waterlogged.Waterlogged;
 import com.gtnewhorizons.waterlogged.internal.tick.FluidTickNbt;
 import com.gtnewhorizons.waterlogged.internal.tick.WorldFluidTicks;
+
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 /** ChunkAPI manager that saves pending stored-fluid ticks per chunk and drops them from memory on the unload save. */
 public final class TicksDataManager implements DataManager.ChunkDataManager {
@@ -78,4 +81,14 @@ public final class TicksDataManager implements DataManager.ChunkDataManager {
 
     @Override
     public void cloneChunk(Chunk from, Chunk to) {}
+
+    // Forge reads chunk NBT on its IO thread before the chunk is in the world; schedule its ticks once it is
+    @SubscribeEvent
+    public void onChunkLoad(ChunkEvent.Load event) {
+        Chunk chunk = event.getChunk();
+        if (chunk.worldObj instanceof WorldServer) {
+            ((WorldFluidTicks) chunk.worldObj).waterlogged$ticks()
+                .commitChunk(chunk.xPosition, chunk.zPosition);
+        }
+    }
 }

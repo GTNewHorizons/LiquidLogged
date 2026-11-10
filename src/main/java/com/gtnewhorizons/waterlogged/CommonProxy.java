@@ -22,6 +22,7 @@ public class CommonProxy {
         DataRegistry.registerDataManager(FluidsDataManager.INSTANCE, FluidsDataManager.ORDERING);
         DataRegistry.registerDataManager(TicksDataManager.INSTANCE, FluidsDataManager.ORDERING);
         MinecraftForge.EVENT_BUS.register(new PlacementHandler());
+        MinecraftForge.EVENT_BUS.register(TicksDataManager.INSTANCE);
     }
 
     public void serverStarting(FMLServerStartingEvent event) {

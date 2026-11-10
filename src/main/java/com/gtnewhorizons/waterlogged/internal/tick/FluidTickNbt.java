@@ -28,7 +28,7 @@ public final class FluidTickNbt {
         out.setTag("ticks", list);
     }
 
-    /** Reads the ticks of chunk (cx, cz) into {@code into}, due relative to {@code now}. */
+    /** Stages the ticks of chunk (cx, cz) in {@code into}, due relative to {@code now}; commit them on chunk load. */
     public static void read(NBTTagCompound in, int cx, int cz, long now, FluidTickList into) {
         if (in == null || in.getByte("v") != VERSION) {
             return;
@@ -39,7 +39,7 @@ public final class FluidTickNbt {
             if (e.length < 5) {
                 continue;
             }
-            into.schedule(cx << 4 | e[0], e[1], cz << 4 | e[2], now + e[3], e[4]);
+            into.stage(cx << 4 | e[0], e[1], cz << 4 | e[2], now + e[3], e[4]);
         }
     }
 }

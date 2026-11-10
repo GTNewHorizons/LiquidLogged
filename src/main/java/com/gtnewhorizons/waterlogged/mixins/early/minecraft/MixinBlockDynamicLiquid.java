@@ -9,6 +9,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.gtnewhorizons.waterlogged.internal.flow.LoggedFlow;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 
 @Mixin(BlockDynamicLiquid.class)
 public abstract class MixinBlockDynamicLiquid {
@@ -19,5 +22,34 @@ public abstract class MixinBlockDynamicLiquid {
         if (LoggedFlow.isHolder(world.getBlock(x, y, z))) {
             cir.setReturnValue(true);
         }
+    }
+
+    // A stored fluid behind a closed face (stair back, slab bottom) must not feed this cell or count as its source
+    @WrapOperation(
+        method = "updateTick",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/block/BlockDynamicLiquid;func_149810_a(Lnet/minecraft/world/World;IIII)I"))
+    private int waterlogged$sideNeighbour(BlockDynamicLiquid self, World world, int nx, int ny, int nz, int smallest,
+        Operation<Integer> original, @Local(argsOnly = true, ordinal = 0) int x,
+        @Local(argsOnly = true, ordinal = 1) int y, @Local(argsOnly = true, ordinal = 2) int z) {
+        if (LoggedFlow.isClosedStoredNeighbour(world, x, y, z, nx, ny, nz)) {
+            return smallest;
+        }
+        return original.call(self, world, nx, ny, nz, smallest);
+    }
+
+    @WrapOperation(
+        method = "updateTick",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/block/BlockDynamicLiquid;func_149804_e(Lnet/minecraft/world/World;III)I"))
+    private int waterlogged$neighbourAbove(BlockDynamicLiquid self, World world, int nx, int ny, int nz,
+        Operation<Integer> original, @Local(argsOnly = true, ordinal = 0) int x,
+        @Local(argsOnly = true, ordinal = 1) int y, @Local(argsOnly = true, ordinal = 2) int z) {
+        if (LoggedFlow.isClosedStoredNeighbour(world, x, y, z, nx, ny, nz)) {
+            return -1;
+        }
+        return original.call(self, world, nx, ny, nz);
     }
 }

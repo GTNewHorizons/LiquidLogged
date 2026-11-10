@@ -13,7 +13,29 @@ public final class FluidTickList {
     // Synchronized: Forge reads chunk NBT, and so our ticks, on its chunk IO thread
     private final TreeSet<FluidTick> queue = new TreeSet<>(FluidTick.ORDER);
     private final Map<Long, FluidTick> byPos = new HashMap<>();
+    // Ticks read from disk wait here until their chunk is in the world; polling them earlier would drop them
+    private final Map<Long, List<FluidTick>> staged = new HashMap<>();
     private long seq;
+
+    /** Keeps a tick read from chunk NBT aside until {@link #commitChunk} for its chunk. */
+    public synchronized void stage(int x, int y, int z, long due, int priority) {
+        staged.computeIfAbsent(chunkKey(x >> 4, z >> 4), k -> new ArrayList<>())
+            .add(new FluidTick(x, y, z, due, priority, 0));
+    }
+
+    /** Schedules the staged ticks of chunk (cx, cz); call once the chunk is loaded into the world. */
+    public synchronized void commitChunk(int cx, int cz) {
+        List<FluidTick> ticks = staged.remove(chunkKey(cx, cz));
+        if (ticks != null) {
+            for (FluidTick t : ticks) {
+                schedule(t.x, t.y, t.z, t.due, t.priority);
+            }
+        }
+    }
+
+    private static long chunkKey(int cx, int cz) {
+        return (long) cx << 32 | (cz & 0xFFFFFFFFL);
+    }
 
     /** Schedules a tick; if one is already pending at this position, the earlier of the two is kept. */
     public synchronized void schedule(int x, int y, int z, long due, int priority) {

@@ -85,6 +85,26 @@ class FluidTickListTest {
     }
 
     @Test
+    void stagedTicksWaitForChunkLoad() {
+        FluidTickList list = new FluidTickList();
+        list.stage(3, 64, 3, 0, 0);
+        assertTrue(
+            list.pollDue(100, 10)
+                .isEmpty());
+        list.commitChunk(1, 0);
+        assertTrue(
+            list.pollDue(100, 10)
+                .isEmpty());
+        list.commitChunk(0, 0);
+        assertEquals(
+            1,
+            list.pollDue(100, 10)
+                .size());
+        list.commitChunk(0, 0);
+        assertEquals(0, list.size());
+    }
+
+    @Test
     void ticksSurviveChunkRoundTrip() {
         FluidTickList saved = new FluidTickList();
         saved.schedule(-30, 70, 18, 1005, 1);
@@ -94,6 +114,7 @@ class FluidTickListTest {
 
         FluidTickList loaded = new FluidTickList();
         FluidTickNbt.read(nbt, -2, 1, 5000, loaded);
+        loaded.commitChunk(-2, 1);
         assertTrue(
             loaded.pollDue(5004, 10)
                 .isEmpty());

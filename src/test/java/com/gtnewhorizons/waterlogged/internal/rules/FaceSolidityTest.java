@@ -51,6 +51,36 @@ class FaceSolidityTest {
     }
 
     @Test
+    void leavesBlockAllSides() {
+        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+            assertTrue(FaceSolidity.isSolid(Shape.LEAVES, 0, d));
+        }
+    }
+
+    @Test
+    void closedBottomTrapdoorBlocksDownOnly() {
+        assertTrue(FaceSolidity.isSolid(Shape.TRAPDOOR, 0, ForgeDirection.DOWN));
+        assertFalse(FaceSolidity.isSolid(Shape.TRAPDOOR, 0, ForgeDirection.UP));
+        assertFalse(FaceSolidity.isSolid(Shape.TRAPDOOR, 0, ForgeDirection.SOUTH));
+    }
+
+    @Test
+    void closedTopTrapdoorBlocksUpOnly() {
+        assertTrue(FaceSolidity.isSolid(Shape.TRAPDOOR, 8, ForgeDirection.UP));
+        assertFalse(FaceSolidity.isSolid(Shape.TRAPDOOR, 8, ForgeDirection.DOWN));
+    }
+
+    @Test
+    void openTrapdoorBlocksHingeSide() {
+        assertTrue(FaceSolidity.isSolid(Shape.TRAPDOOR, 4, ForgeDirection.SOUTH));
+        assertTrue(FaceSolidity.isSolid(Shape.TRAPDOOR, 4 | 1, ForgeDirection.NORTH));
+        assertTrue(FaceSolidity.isSolid(Shape.TRAPDOOR, 4 | 2, ForgeDirection.EAST));
+        assertTrue(FaceSolidity.isSolid(Shape.TRAPDOOR, 4 | 3, ForgeDirection.WEST));
+        assertFalse(FaceSolidity.isSolid(Shape.TRAPDOOR, 4, ForgeDirection.DOWN));
+        assertFalse(FaceSolidity.isSolid(Shape.TRAPDOOR, 4, ForgeDirection.NORTH));
+    }
+
+    @Test
     void otherNeverSolid() {
         for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
             assertFalse(FaceSolidity.isSolid(Shape.OTHER, 0, d));

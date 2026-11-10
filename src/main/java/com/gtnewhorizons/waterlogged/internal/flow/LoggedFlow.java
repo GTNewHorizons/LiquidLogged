@@ -7,8 +7,10 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
+import net.minecraft.block.BlockTrapDoor;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.IBlockAccess;
@@ -19,6 +21,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 
 import com.gtnewhorizons.waterlogged.Waterlogged;
 import com.gtnewhorizons.waterlogged.api.IFluidHolder;
+import com.gtnewhorizons.waterlogged.api.WaterloggedAPI;
 import com.gtnewhorizons.waterlogged.internal.rules.FaceSolidity;
 import com.gtnewhorizons.waterlogged.internal.rules.VanillaHolders;
 import com.gtnewhorizons.waterlogged.mixins.early.minecraft.AccessorBlockDynamicLiquid;
@@ -76,18 +79,60 @@ public final class LoggedFlow {
             && !isSideClosed(world, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, dir.getOpposite());
     }
 
-    /** Returns true if the block in the cell closes the given side to fluid. */
+    /** Returns true if the stored fluid in neighbour (nx, ny, nz) must not feed cell (x, y, z) through their face. */
+    public static boolean isClosedStoredNeighbour(IBlockAccess world, int x, int y, int z, int nx, int ny, int nz) {
+        if (WaterloggedAPI.getFluid(world, nx, ny, nz) == null) {
+            return false;
+        }
+        for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+            if (x + d.offsetX == nx && y + d.offsetY == ny && z + d.offsetZ == nz) {
+                return !canPass(world, x, y, z, d);
+            }
+        }
+        return false;
+    }
+
+    /** Returns true if the block in the cell closes the given side to fluid flow. */
     public static boolean isSideClosed(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
+        return isSideClosed(world, x, y, z, side, false);
+    }
+
+    /** Returns true if the block hides the stored fluid's face on that side when drawn. */
+    public static boolean isSideCoveredForRender(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
+        return isSideClosed(world, x, y, z, side, true);
+    }
+
+    private static boolean isSideClosed(IBlockAccess world, int x, int y, int z, ForgeDirection side,
+        boolean forRender) {
         Block block = world.getBlock(x, y, z);
         if (VanillaHolders.isVanillaHolder(block)) {
-            FaceSolidity.Shape shape = block instanceof BlockStairs ? FaceSolidity.Shape.STAIRS
-                : block instanceof BlockSlab ? FaceSolidity.Shape.SLAB : FaceSolidity.Shape.OTHER;
+            FaceSolidity.Shape shape = shapeOf(block);
+            // Leaves stop flow but are see-through; 26.2 still draws the water inside them
+            if (forRender && shape == FaceSolidity.Shape.LEAVES) {
+                return false;
+            }
             return FaceSolidity.isSolid(shape, world.getBlockMetadata(x, y, z), side);
         }
         if (block instanceof IFluidHolder) {
             return !((IFluidHolder) block).isFluidPassable(world, x, y, z, side);
         }
         return block.isSideSolid(world, x, y, z, side);
+    }
+
+    private static FaceSolidity.Shape shapeOf(Block block) {
+        if (block instanceof BlockStairs) {
+            return FaceSolidity.Shape.STAIRS;
+        }
+        if (block instanceof BlockSlab) {
+            return FaceSolidity.Shape.SLAB;
+        }
+        if (block instanceof BlockLeaves) {
+            return FaceSolidity.Shape.LEAVES;
+        }
+        if (block instanceof BlockTrapDoor) {
+            return FaceSolidity.Shape.TRAPDOOR;
+        }
+        return FaceSolidity.Shape.OTHER;
     }
 
     /** Returns true if flowing fluid must not wash this block away, because it may hold a fluid. */

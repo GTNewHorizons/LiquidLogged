@@ -7,11 +7,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.FillBucketEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
 import com.gtnewhorizons.waterlogged.api.WaterloggedAPI;
+
+import cpw.mods.fml.common.eventhandler.Event;
 
 /** Bucket use on blocks that hold or may hold a fluid (design §7.2.2–3); null means "let vanilla handle it". */
 public final class BucketHooks {
@@ -30,6 +34,10 @@ public final class BucketHooks {
         if (fluid == null || WaterloggedAPI.getFluid(world, x, y, z) != null
             || !WaterloggedAPI.canHold(world, x, y, z, fluid)) {
             return null;
+        }
+        ItemStack handled = postFillEvent(stack, world, player, hit);
+        if (handled != null) {
+            return handled;
         }
         if (!world.canMineBlock(player, x, y, z) || !player.canPlayerEdit(x, y, z, hit.sideHit, stack)) {
             return stack;
@@ -60,6 +68,10 @@ public final class BucketHooks {
         if (filled == null) {
             return null;
         }
+        ItemStack handled = postFillEvent(stack, world, player, hit);
+        if (handled != null) {
+            return handled;
+        }
         if (!world.canMineBlock(player, x, y, z) || !player.canPlayerEdit(x, y, z, hit.sideHit, stack)) {
             return stack;
         }
@@ -86,6 +98,29 @@ public final class BucketHooks {
             return false;
         }
         return world.isRemote || WaterloggedAPI.setFluid(world, x, y, z, fluid);
+    }
+
+    // We cancel vanilla's onItemRightClick before its own FillBucketEvent, so protection mods only see this one
+    private static @Nullable ItemStack postFillEvent(ItemStack stack, World world, EntityPlayer player,
+        MovingObjectPosition hit) {
+        FillBucketEvent event = new FillBucketEvent(player, stack, world, hit);
+        if (MinecraftForge.EVENT_BUS.post(event)) {
+            return stack;
+        }
+        if (event.getResult() != Event.Result.ALLOW) {
+            return null;
+        }
+        // Same handling as vanilla ItemBucket for an event another mod answered
+        if (player.capabilities.isCreativeMode) {
+            return stack;
+        }
+        if (--stack.stackSize <= 0) {
+            return event.result;
+        }
+        if (!player.inventory.addItemStackToInventory(event.result)) {
+            player.dropPlayerItemWithRandomChoice(event.result, false);
+        }
+        return stack;
     }
 
     private static boolean isBlockHit(@Nullable MovingObjectPosition hit) {

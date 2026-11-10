@@ -25,7 +25,8 @@ public enum Mixins implements IMixins {
             .setApplyIf(() -> true)
             .setPhase(Phase.EARLY)),
     LIQUID_NEIGHBOURS(new MixinBuilder("Liquids see blocks holding a fluid as that fluid's source")
-            .addCommonMixins("minecraft.MixinBlockLiquid")
+            .addCommonMixins("minecraft.MixinBlockLiquid", "minecraft.MixinBlockFluidClassic")
+            .addClientMixins("minecraft.client.MixinBlockLiquid_Client", "minecraft.client.MixinBlockFluidBase")
             .setApplyIf(() -> true)
             .setPhase(Phase.EARLY)),
     FLOW(new MixinBuilder("Stored fluid ticks and flow out of blocks")
@@ -48,7 +49,10 @@ public enum Mixins implements IMixins {
             .setApplyIf(() -> true)
             .setPhase(Phase.EARLY)),
     RENDER(new MixinBuilder("Draw the fluid stored in blocks")
-            .addClientMixins("minecraft.client.MixinWorldRenderer", "minecraft.client.MixinRenderBlocks")
+            .addClientMixins(
+                "minecraft.client.MixinWorldRenderer",
+                "minecraft.client.MixinRenderBlocks",
+                "minecraft.client.MixinRenderBlockFluid")
             .setApplyIf(() -> true)
             .setPhase(Phase.EARLY));
     // spotless:on
