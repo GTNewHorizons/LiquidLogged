@@ -35,7 +35,9 @@ public final class BucketHooks {
             || !LiquidLoggedAPI.canHold(world, x, y, z, fluid)) {
             return null;
         }
-        ItemStack handled = postFillEvent(stack, world, player, hit);
+        ItemStack emptied = FluidContainerRegistry.drainFluidContainer(stack);
+        ItemStack bucketAfter = emptied != null ? emptied : stack;
+        ItemStack handled = postFillEvent(stack, world, player, hit, bucketAfter);
         if (handled != null) {
             return handled;
         }
@@ -45,11 +47,7 @@ public final class BucketHooks {
         if (!world.isRemote && !LiquidLoggedAPI.setFluid(world, x, y, z, fluid)) {
             return stack;
         }
-        if (player.capabilities.isCreativeMode) {
-            return stack;
-        }
-        ItemStack emptied = FluidContainerRegistry.drainFluidContainer(stack);
-        return emptied != null ? emptied : stack;
+        return player.capabilities.isCreativeMode ? stack : bucketAfter;
     }
 
     /** Empty bucket aimed at a block holding a fluid: take the fluid out. */
@@ -68,7 +66,7 @@ public final class BucketHooks {
         if (filled == null) {
             return null;
         }
-        ItemStack handled = postFillEvent(stack, world, player, hit);
+        ItemStack handled = postFillEvent(stack, world, player, hit, null);
         if (handled != null) {
             return handled;
         }
@@ -102,12 +100,17 @@ public final class BucketHooks {
 
     // We cancel vanilla's onItemRightClick before its own FillBucketEvent, so protection mods only see this one
     private static @Nullable ItemStack postFillEvent(ItemStack stack, World world, EntityPlayer player,
-        MovingObjectPosition hit) {
+        MovingObjectPosition hit, @Nullable ItemStack claimedResult) {
         FillBucketEvent event = new FillBucketEvent(player, stack, world, hit);
+        if (claimedResult != null) {
+            // CoFH skips answered events; unanswered, it fills the neighbour cell of a block like an AE2 cable
+            event.result = claimedResult;
+            event.setResult(Event.Result.ALLOW);
+        }
         if (MinecraftForge.EVENT_BUS.post(event)) {
             return stack;
         }
-        if (event.getResult() != Event.Result.ALLOW) {
+        if (event.getResult() != Event.Result.ALLOW || (claimedResult != null && event.result == claimedResult)) {
             return null;
         }
         // Same handling as vanilla ItemBucket for an event another mod answered
