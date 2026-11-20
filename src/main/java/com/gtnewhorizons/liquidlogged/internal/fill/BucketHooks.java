@@ -110,6 +110,9 @@ public final class BucketHooks {
         if (MinecraftForge.EVENT_BUS.post(event)) {
             return stack;
         }
+        if (event.getResult() == Event.Result.DENY) {
+            return stack;
+        }
         if (event.getResult() != Event.Result.ALLOW || (claimedResult != null && event.result == claimedResult)) {
             return null;
         }
