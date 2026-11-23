@@ -58,6 +58,11 @@ public abstract class MixinWorld implements LiquidLoggedBlockAccess {
         }
     }
 
+    @Override
+    public int liquidlogged$getFluidLevel(int x, int y, int z) {
+        return blockExists(x, y, z) ? ChunkFluids.level(getChunkFromBlockCoords(x, z), x & 15, y, z & 15) : 0;
+    }
+
     @WrapMethod(method = "setBlock(IIILnet/minecraft/block/Block;II)Z")
     private boolean liquidlogged$applyBlockChangeRules(int x, int y, int z, Block block, int meta, int flags,
         Operation<Boolean> original) {
@@ -67,6 +72,7 @@ public abstract class MixinWorld implements LiquidLoggedBlockAccess {
             return original.call(x, y, z, block, meta, flags);
         }
         Block oldBlock = getBlock(x, y, z);
+        int level = liquidlogged$getFluidLevel(x, y, z);
         int oldMeta = getBlockMetadata(x, y, z);
         if (!original.call(x, y, z, block, meta, flags)) {
             return false;
@@ -83,7 +89,7 @@ public abstract class MixinWorld implements LiquidLoggedBlockAccess {
                 WorldFluids.setUnchecked(world, x, y, z, null);
                 Block fluidBlock = BlockChangeRules.sourceBlock(fluid);
                 if (fluidBlock != null) {
-                    setBlock(x, y, z, fluidBlock, 0, 3);
+                    setBlock(x, y, z, fluidBlock, level, 3);
                 }
                 break;
         }

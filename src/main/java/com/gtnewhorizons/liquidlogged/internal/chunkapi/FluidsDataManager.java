@@ -141,17 +141,23 @@ public final class FluidsDataManager
     @Override
     public void writeBlockToPacket(Chunk chunk, int x, int y, int z, S23PacketBlockChange packet) {
         Fluid fluid = ChunkFluids.get(chunk, x, y, z);
-        ((LiquidLoggedBlockPacket) packet).liquidlogged$setFluidId(fluid == null ? -1 : fluid.getID());
+        LiquidLoggedBlockPacket data = (LiquidLoggedBlockPacket) packet;
+        data.liquidlogged$setFluidId(fluid == null ? -1 : fluid.getID());
+        data.liquidlogged$setFluidLevel(ChunkFluids.level(chunk, x, y, z));
     }
 
     @Override
     public void readBlockFromPacket(Chunk chunk, int x, int y, int z, S23PacketBlockChange packet) {
-        int id = ((LiquidLoggedBlockPacket) packet).liquidlogged$getFluidId();
+        LiquidLoggedBlockPacket data = (LiquidLoggedBlockPacket) packet;
+        int id = data.liquidlogged$getFluidId();
+        int level = fluidLevel(data, id);
         Fluid fluid = id < 0 ? null : FluidRegistry.getFluid(id);
         Fluid old = ChunkFluids.get(chunk, x, y, z);
-        if (old != fluid) {
-            ChunkFluids.set(chunk, x, y, z, fluid);
-            LightHooks.onFluidChanged(chunk.worldObj, chunk, x, y, z, old, fluid);
+        if (old != fluid || ChunkFluids.level(chunk, x, y, z) != level) {
+            ChunkFluids.set(chunk, x, y, z, fluid, level);
+            if (old != fluid) {
+                LightHooks.onFluidChanged(chunk.worldObj, chunk, x, y, z, old, fluid);
+            }
             int wx = chunk.xPosition << 4 | x;
             int wz = chunk.zPosition << 4 | z;
             chunk.worldObj.markBlockRangeForRenderUpdate(wx, y, wz, wx, y, wz);
@@ -160,12 +166,21 @@ public final class FluidsDataManager
 
     @Override
     public void writeBlockPacketToBuffer(S23PacketBlockChange packet, PacketBuffer buffer) {
-        buffer.writeVarIntToBuffer(((LiquidLoggedBlockPacket) packet).liquidlogged$getFluidId() + 1);
+        LiquidLoggedBlockPacket data = (LiquidLoggedBlockPacket) packet;
+        int id = data.liquidlogged$getFluidId();
+        buffer.writeVarIntToBuffer((id + 1) << 4 | fluidLevel(data, id));
     }
 
     @Override
     public void readBlockPacketFromBuffer(S23PacketBlockChange packet, PacketBuffer buffer) {
-        ((LiquidLoggedBlockPacket) packet).liquidlogged$setFluidId(buffer.readVarIntFromBuffer() - 1);
+        LiquidLoggedBlockPacket data = (LiquidLoggedBlockPacket) packet;
+        int value = buffer.readVarIntFromBuffer();
+        data.liquidlogged$setFluidId((value >>> 4) - 1);
+        data.liquidlogged$setFluidLevel(value & 15);
+    }
+
+    private static int fluidLevel(LiquidLoggedBlockPacket data, int id) {
+        return id < 0 ? 0 : data.liquidlogged$getFluidLevel();
     }
 
     private @Nullable Fluid lookupFluid(String name) {

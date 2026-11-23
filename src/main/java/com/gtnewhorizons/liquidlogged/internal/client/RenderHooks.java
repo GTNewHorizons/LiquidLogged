@@ -8,9 +8,10 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 
 import com.gtnewhorizons.liquidlogged.api.LiquidLoggedAPI;
+import com.gtnewhorizons.liquidlogged.internal.WorldFluids;
 import com.gtnewhorizons.liquidlogged.internal.flow.LoggedFlow;
 
-/** Render and material helpers: a cell holding a fluid looks like that fluid's source block. */
+/** Exposes the stored fluid and its level to rendering and material checks. */
 public final class RenderHooks {
 
     // True while a fluid stored in a block is being drawn; Angelica meshes off-thread, hence per thread
@@ -29,9 +30,9 @@ public final class RenderHooks {
         return fluidBlock != null ? fluidBlock : block;
     }
 
-    /** Returns 0 (source) for a cell that holds a fluid, else {@code meta}. */
-    public static int metaOrSource(IBlockAccess world, int x, int y, int z, int meta) {
-        return storedFluidBlock(world, x, y, z) != null ? 0 : meta;
+    /** Returns the stored fluid level or the block metadata if no fluid is stored. */
+    public static int metaOrFluidLevel(IBlockAccess world, int x, int y, int z, int meta) {
+        return storedFluidBlock(world, x, y, z) != null ? WorldFluids.level(world, x, y, z) : meta;
     }
 
     public static boolean isRenderingStored() {

@@ -13,6 +13,7 @@ import net.minecraftforge.fluids.Fluid;
 public final class SectionFluidsNbt {
 
     public static final byte VERSION = 1;
+    private static final byte VERSION_WITH_LEVELS = 2;
     public static final String TYPE_FLUID = "fluid";
 
     private SectionFluidsNbt() {}
@@ -44,7 +45,11 @@ public final class SectionFluidsNbt {
             entry.setString("n", fluid.getName());
             palette.appendTag(entry);
         }
-        out.setByte("v", VERSION);
+        byte[] levels = c.levels();
+        out.setByte("v", levels == null ? VERSION : VERSION_WITH_LEVELS);
+        if (levels != null) {
+            out.setByteArray("levels", levels);
+        }
         out.setTag("palette", palette);
         out.setByteArray("data", c.raw());
     }
@@ -55,7 +60,7 @@ public final class SectionFluidsNbt {
             return new Result(null, false, null);
         }
         byte version = in.getByte("v");
-        if (version != VERSION) {
+        if (version != VERSION && version != VERSION_WITH_LEVELS) {
             // Written by a newer mod version: keep the tag untouched so saving does not erase it
             return new Result(null, false, (NBTTagCompound) in.copy());
         }
@@ -76,7 +81,11 @@ public final class SectionFluidsNbt {
         if (data.length != SectionFluids.SIZE) {
             return new Result(null, dropped, null);
         }
-        SectionFluids fluids = SectionFluids.of(palette, data);
+        byte[] levels = version == VERSION_WITH_LEVELS ? in.getByteArray("levels") : null;
+        if (levels != null && levels.length != SectionFluids.SIZE) {
+            return new Result(null, dropped, null);
+        }
+        SectionFluids fluids = SectionFluids.of(palette, data, levels);
         return new Result(fluids.isEmpty() ? null : fluids, dropped, null);
     }
 }

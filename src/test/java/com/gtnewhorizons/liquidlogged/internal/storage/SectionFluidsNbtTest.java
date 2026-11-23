@@ -38,7 +38,7 @@ class SectionFluidsNbtTest {
         SectionFluids f = new SectionFluids();
         f.set(SectionFluids.index(0, 0, 0), WATER);
         f.set(SectionFluids.index(1, 2, 3), OIL);
-        f.set(SectionFluids.index(15, 15, 15), WATER);
+        f.set(SectionFluids.index(15, 15, 15), WATER, 5);
         NBTTagCompound nbt = new NBTTagCompound();
         SectionFluidsNbt.write(f, nbt);
 
@@ -48,6 +48,8 @@ class SectionFluidsNbtTest {
         assertSame(WATER, r.fluids.get(SectionFluids.index(0, 0, 0)));
         assertSame(OIL, r.fluids.get(SectionFluids.index(1, 2, 3)));
         assertSame(WATER, r.fluids.get(SectionFluids.index(15, 15, 15)));
+        assertEquals(5, r.fluids.level(SectionFluids.index(15, 15, 15)));
+        assertEquals(0, r.fluids.level(SectionFluids.index(0, 0, 0)));
     }
 
     @Test
@@ -89,7 +91,7 @@ class SectionFluidsNbtTest {
     @Test
     void newerVersionIsPreserved() {
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setByte("v", (byte) 2);
+        nbt.setByte("v", (byte) 3);
         nbt.setString("future", "data");
 
         SectionFluidsNbt.Result r = SectionFluidsNbt.read(nbt, KNOWN::get);

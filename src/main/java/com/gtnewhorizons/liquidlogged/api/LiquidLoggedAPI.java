@@ -51,7 +51,7 @@ public final class LiquidLoggedAPI {
             return false;
         }
         Fluid old = getFluid(world, x, y, z);
-        if (old == fluid) {
+        if (old == fluid && WorldFluids.level(world, x, y, z) == 0) {
             return true;
         }
         if (MinecraftForge.EVENT_BUS.post(new FluidLogEvent(world, x, y, z, old, fluid))) {

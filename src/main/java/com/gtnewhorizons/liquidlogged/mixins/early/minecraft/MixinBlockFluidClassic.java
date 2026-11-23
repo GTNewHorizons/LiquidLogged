@@ -31,6 +31,6 @@ public abstract class MixinBlockFluidClassic {
         remap = false,
         at = @At(value = "INVOKE", target = "Lnet/minecraft/world/IBlockAccess;getBlockMetadata(III)I", remap = true))
     private int liquidlogged$fluidAsSource(IBlockAccess world, int x, int y, int z, Operation<Integer> original) {
-        return RenderHooks.metaOrSource(world, x, y, z, original.call(world, x, y, z));
+        return RenderHooks.metaOrFluidLevel(world, x, y, z, original.call(world, x, y, z));
     }
 }

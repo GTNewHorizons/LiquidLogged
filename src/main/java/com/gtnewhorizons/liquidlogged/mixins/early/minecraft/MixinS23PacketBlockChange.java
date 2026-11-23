@@ -13,6 +13,9 @@ public abstract class MixinS23PacketBlockChange implements LiquidLoggedBlockPack
     @Unique
     private int liquidlogged$fluidId = -1;
 
+    @Unique
+    private int liquidlogged$fluidLevel;
+
     @Override
     public int liquidlogged$getFluidId() {
         return liquidlogged$fluidId;
@@ -21,5 +24,15 @@ public abstract class MixinS23PacketBlockChange implements LiquidLoggedBlockPack
     @Override
     public void liquidlogged$setFluidId(int id) {
         liquidlogged$fluidId = id;
+    }
+
+    @Override
+    public int liquidlogged$getFluidLevel() {
+        return liquidlogged$fluidLevel;
+    }
+
+    @Override
+    public void liquidlogged$setFluidLevel(int level) {
+        liquidlogged$fluidLevel = level;
     }
 }

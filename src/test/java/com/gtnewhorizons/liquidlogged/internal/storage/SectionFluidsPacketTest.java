@@ -49,19 +49,23 @@ class SectionFluidsPacketTest {
         SectionFluids sparse = new SectionFluids();
         sparse.set(SectionFluids.index(0, 0, 0), water);
         sparse.set(SectionFluids.index(5, 6, 7), lava);
-        sparse.set(SectionFluids.index(15, 15, 15), water);
+        sparse.set(SectionFluids.index(15, 15, 15), water, 7);
         SectionFluids s = roundTrip(sparse);
         assertEquals(3, s.count());
         assertSame(lava, s.get(SectionFluids.index(5, 6, 7)));
         assertSame(water, s.get(SectionFluids.index(15, 15, 15)));
+        assertEquals(7, s.level(SectionFluids.index(15, 15, 15)));
 
         SectionFluids dense = new SectionFluids();
         for (int i = 0; i < 4000; i++) {
             dense.set(i, (i & 1) == 0 ? water : lava);
         }
+        dense.set(0, water, 13);
         SectionFluids d = roundTrip(dense);
         assertEquals(4000, d.count());
         assertSame(water, d.get(0));
+        assertEquals(13, d.level(0));
+        assertEquals(0, d.level(3999));
         assertSame(lava, d.get(3999));
         assertNull(d.get(4000));
     }

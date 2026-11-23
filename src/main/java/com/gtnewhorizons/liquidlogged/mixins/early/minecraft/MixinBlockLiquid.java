@@ -15,7 +15,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 @Mixin(BlockLiquid.class)
 public abstract class MixinBlockLiquid {
 
-    // Neighbouring cells holding a fluid count as that fluid's source: flow points away from them
     @WrapOperation(
         method = "getEffectiveFlowDecay",
         at = @At(
@@ -29,10 +28,10 @@ public abstract class MixinBlockLiquid {
         method = "getEffectiveFlowDecay",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/world/IBlockAccess;getBlockMetadata(III)I"))
     private int liquidlogged$fluidAsSource(IBlockAccess world, int x, int y, int z, Operation<Integer> original) {
-        return RenderHooks.metaOrSource(world, x, y, z, original.call(world, x, y, z));
+        return RenderHooks.metaOrFluidLevel(world, x, y, z, original.call(world, x, y, z));
     }
 
-    // func_149804_e: neighbouring stored fluid feeds flow and counts as a source.
+    // func_149804_e: neighbouring stored fluid feeds flow at its stored level.
     // func_149805_n: lava next to a block holding water hardens into obsidian or cobblestone, as in 26.2
     @WrapOperation(
         method = { "func_149804_e", "func_149805_n" },
@@ -45,6 +44,6 @@ public abstract class MixinBlockLiquid {
         method = "func_149804_e",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getBlockMetadata(III)I"))
     private int liquidlogged$worldFluidAsSource(World world, int x, int y, int z, Operation<Integer> original) {
-        return RenderHooks.metaOrSource(world, x, y, z, original.call(world, x, y, z));
+        return RenderHooks.metaOrFluidLevel(world, x, y, z, original.call(world, x, y, z));
     }
 }

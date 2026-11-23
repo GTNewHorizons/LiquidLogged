@@ -10,4 +10,8 @@ public interface LiquidLoggedBlockAccess {
     /** Returns the fluid stored in the block at world coordinates, or null. */
     @Nullable
     Fluid liquidlogged$getFluid(int x, int y, int z);
+
+    default int liquidlogged$getFluidLevel(int x, int y, int z) {
+        return 0;
+    }
 }

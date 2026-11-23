@@ -16,6 +16,7 @@ public final class SectionFluids implements SectionFluidsView {
 
     // raw[i] == 0 means no fluid, raw[i] == k means palette[k - 1]
     private final byte[] raw;
+    private byte[] levels;
     private Fluid[] palette;
     private int[] refs;
     private int count;
@@ -38,11 +39,15 @@ public final class SectionFluids implements SectionFluidsView {
 
     /** Builds a section from a palette and raw cell values; cells pointing to a null or missing entry stay empty. */
     public static SectionFluids of(@Nullable Fluid[] palette, byte[] raw) {
+        return of(palette, raw, null);
+    }
+
+    static SectionFluids of(@Nullable Fluid[] palette, byte[] raw, @Nullable byte[] levels) {
         SectionFluids f = new SectionFluids();
         for (int i = 0; i < SIZE; i++) {
             int v = raw[i] & 0xFF;
             if (v != 0 && v <= palette.length && palette[v - 1] != null) {
-                f.set(i, palette[v - 1]);
+                f.set(i, palette[v - 1], levels == null ? 0 : levels[i] & 15);
             }
         }
         return f;
@@ -55,11 +60,16 @@ public final class SectionFluids implements SectionFluidsView {
 
     /** Sets the fluid of a cell; returns false and changes nothing when the palette already holds 255 other fluids. */
     public boolean set(int index, @Nullable Fluid fluid) {
+        return set(index, fluid, 0);
+    }
+
+    public boolean set(int index, @Nullable Fluid fluid, int level) {
         int old = raw[index] & 0xFF;
         if (fluid == null) {
             if (old != 0) {
                 release(old - 1);
                 raw[index] = 0;
+                setLevel(index, 0);
                 count--;
             }
             return true;
@@ -71,6 +81,7 @@ public final class SectionFluids implements SectionFluidsView {
                 return false;
             }
         }
+        setLevel(index, level);
         if (old == slot + 1) {
             return true;
         }
@@ -82,6 +93,24 @@ public final class SectionFluids implements SectionFluidsView {
         refs[slot]++;
         raw[index] = (byte) (slot + 1);
         return true;
+    }
+
+    public int level(int index) {
+        return levels == null ? 0 : levels[index];
+    }
+
+    @Nullable
+    byte[] levels() {
+        return levels;
+    }
+
+    private void setLevel(int index, int level) {
+        if (level != 0 && levels == null) {
+            levels = new byte[SIZE];
+        }
+        if (levels != null) {
+            levels[index] = (byte) level;
+        }
     }
 
     public int count() {
@@ -101,7 +130,9 @@ public final class SectionFluids implements SectionFluidsView {
     }
 
     public SectionFluids copy() {
-        return new SectionFluids(raw.clone(), palette.clone(), refs.clone(), count);
+        SectionFluids copy = new SectionFluids(raw.clone(), palette.clone(), refs.clone(), count);
+        copy.levels = levels == null ? null : levels.clone();
+        return copy;
     }
 
     /** Returns a copy whose palette has no unused entries, so raw value k always means palette()[k - 1]. */
@@ -128,7 +159,9 @@ public final class SectionFluids implements SectionFluidsView {
                 newRaw[i] = (byte) remap[v - 1];
             }
         }
-        return new SectionFluids(newRaw, newPalette, newRefs, count);
+        SectionFluids copy = new SectionFluids(newRaw, newPalette, newRefs, count);
+        copy.levels = levels == null ? null : levels.clone();
+        return copy;
     }
 
     /** Returns the palette in use order; only meaningful on a {@link #compacted()} section. */
