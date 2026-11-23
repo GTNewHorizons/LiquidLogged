@@ -14,6 +14,7 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
 import com.gtnewhorizons.liquidlogged.api.LiquidLoggedAPI;
+import com.gtnewhorizons.liquidlogged.internal.WorldFluids;
 
 import cpw.mods.fml.common.eventhandler.Event;
 
@@ -31,8 +32,7 @@ public final class BucketHooks {
         FluidStack contained = FluidContainerRegistry.getFluidForFilledItem(stack);
         Fluid fluid = contained == null ? null : contained.getFluid();
         int x = hit.blockX, y = hit.blockY, z = hit.blockZ;
-        if (fluid == null || LiquidLoggedAPI.getFluid(world, x, y, z) != null
-            || !LiquidLoggedAPI.canHold(world, x, y, z, fluid)) {
+        if (fluid == null || hasSource(world, x, y, z) || !LiquidLoggedAPI.canHold(world, x, y, z, fluid)) {
             return null;
         }
         ItemStack emptied = FluidContainerRegistry.drainFluidContainer(stack);
@@ -58,7 +58,7 @@ public final class BucketHooks {
         }
         int x = hit.blockX, y = hit.blockY, z = hit.blockZ;
         Fluid fluid = LiquidLoggedAPI.getFluid(world, x, y, z);
-        if (fluid == null) {
+        if (fluid == null || WorldFluids.level(world, x, y, z) != 0) {
             return null;
         }
         ItemStack filled = FluidContainerRegistry
@@ -91,11 +91,14 @@ public final class BucketHooks {
     /** Stores the bucket's fluid in the block at the target cell if it may hold it; true when done. */
     public static boolean pourInto(World world, int x, int y, int z, Block bucketContent) {
         Fluid fluid = PlacementHandler.sourceFluid(bucketContent, 0);
-        if (fluid == null || LiquidLoggedAPI.getFluid(world, x, y, z) != null
-            || !LiquidLoggedAPI.canHold(world, x, y, z, fluid)) {
+        if (fluid == null || hasSource(world, x, y, z) || !LiquidLoggedAPI.canHold(world, x, y, z, fluid)) {
             return false;
         }
         return world.isRemote || LiquidLoggedAPI.setFluid(world, x, y, z, fluid);
+    }
+
+    private static boolean hasSource(World world, int x, int y, int z) {
+        return LiquidLoggedAPI.getFluid(world, x, y, z) != null && WorldFluids.level(world, x, y, z) == 0;
     }
 
     // We cancel vanilla's onItemRightClick before its own FillBucketEvent, so protection mods only see this one

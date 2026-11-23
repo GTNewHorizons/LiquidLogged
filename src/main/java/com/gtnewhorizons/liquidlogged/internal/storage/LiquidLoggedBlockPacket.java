@@ -6,4 +6,8 @@ public interface LiquidLoggedBlockPacket {
     int liquidlogged$getFluidId();
 
     void liquidlogged$setFluidId(int id);
+
+    int liquidlogged$getFluidLevel();
+
+    void liquidlogged$setFluidLevel(int level);
 }

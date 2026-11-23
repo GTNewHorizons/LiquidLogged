@@ -12,16 +12,22 @@ public final class ChunkFluids {
     private ChunkFluids() {}
 
     public static @Nullable Fluid get(Chunk chunk, int x, int y, int z) {
-        ExtendedBlockStorage ebs = section(chunk, y);
-        if (ebs == null) {
-            return null;
-        }
-        SectionFluids fluids = ((LiquidLoggedSection) ebs).liquidlogged$get();
+        SectionFluids fluids = fluids(chunk, y);
         return fluids == null ? null : fluids.get(SectionFluids.index(x, y & 15, z));
     }
 
+    public static int level(Chunk chunk, int x, int y, int z) {
+        SectionFluids fluids = fluids(chunk, y);
+        return fluids == null ? 0 : fluids.level(SectionFluids.index(x, y & 15, z));
+    }
+
+    private static @Nullable SectionFluids fluids(Chunk chunk, int y) {
+        ExtendedBlockStorage ebs = section(chunk, y);
+        return ebs == null ? null : ((LiquidLoggedSection) ebs).liquidlogged$get();
+    }
+
     /** Sets the cell's fluid; returns false when the section does not exist or its palette is full. */
-    public static boolean set(Chunk chunk, int x, int y, int z, @Nullable Fluid fluid) {
+    public static boolean set(Chunk chunk, int x, int y, int z, @Nullable Fluid fluid, int level) {
         ExtendedBlockStorage ebs = section(chunk, y);
         if (ebs == null) {
             return fluid == null;
@@ -35,7 +41,7 @@ public final class ChunkFluids {
             fluids = new SectionFluids();
             section.liquidlogged$set(fluids);
         }
-        if (!fluids.set(SectionFluids.index(x, y & 15, z), fluid)) {
+        if (!fluids.set(SectionFluids.index(x, y & 15, z), fluid, level)) {
             return false;
         }
         if (fluids.isEmpty()) {

@@ -2,7 +2,16 @@
 
 LiquidLogged lets a block hold a fluid in the same cell, like waterlogging in modern Minecraft. Vanilla blocks follow Minecraft 26.2 and hold water only: stairs, single slabs, fences, glass panes, iron bars, walls, ladders, signs, chests, ender chests, trapdoors, rails and leaves. A block from another mod holds a fluid only if that mod opts in, and then it can hold any Forge fluid.
 
-You fill a block by placing it into a source block or by pouring a bucket on it. An empty bucket takes the fluid back out. World generation and other mods do not fill blocks on their own. A filled block acts as a permanent source: water flows out through its open faces, you can swim in it, and it dims light and resists explosions like water. Breaking the block leaves a source behind.
+## Required Dependencies
+
+* [ChunkAPI 0.8.4](https://github.com/LegacyModdingMC/ChunkAPI)
+* [UniMixins 0.3.1](https://github.com/LegacyModdingMC/UniMixins)
+
+## Usage
+
+Place a supported block into a fluid source or pour a bucket into it to store a source. You can pick that source back up with a bucket. Breaking the block leaves the source behind.
+
+Flowing water can pass through supported blocks when both faces at each boundary are open. The water drains when its supply stops. You can pour a bucket into a block that holds flowing water to make it a source.
 
 The mod stores fluids per chunk section through ChunkAPI, by fluid name, so EndlessIDs and block ID changes do not touch saved worlds. If you remove the mod, the blocks stay and lose their fluid; ChunkAPI warns about this when you open the world.
 
